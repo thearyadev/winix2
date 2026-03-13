@@ -119,7 +119,6 @@ class LoginCmd(Cmd):
 
         self.config.cognito = login(username, password)
         account = WinixAccount(self.config.cognito.access_token)
-        account.register_user(username)
         account.check_access_token()
         self.config.devices = account.get_device_info_list()
         self.config.save()

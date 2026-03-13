@@ -27,8 +27,12 @@ class WinixAccount:
             "cognitoClientSecretKey": auth.COGNITO_CLIENT_SECRET_KEY,
             "accessToken": self.access_token,
             "uuid": self.get_uuid(),
-            "osVersion": "26",  # oreo
+            "osType": "android",
+            "osVersion": "29",
             "mobileLang": "en",
+            "deviceName": "SM-G988B",
+            "manufacturer": "samsung",
+            "appVersion": "1.0.8",
         }
 
         resp = requests.post(
@@ -41,17 +45,26 @@ class WinixAccount:
             )
 
     def get_device_info_list(self):
+        from winix import auth
+
         resp = requests.post(
             "https://us.mobile.winix-iot.com/getDeviceInfoList",
             json={
                 "accessToken": self.access_token,
                 "uuid": self.get_uuid(),
+                "cognitoClientSecretKey": auth.COGNITO_CLIENT_SECRET_KEY,
+                "osType": "android",
+                "osVersion": "29",
+                "mobileLang": "en",
+                "deviceName": "SM-G988B",
+                "manufacturer": "samsung",
+                "appVersion": "1.0.8",
             },
         )
 
         if resp.status_code != 200:
             raise Exception(
-                f"Error while performing RPC checkAccessToken ({resp.status_code}): {resp.text}"
+                f"Error while performing RPC getDeviceInfoList ({resp.status_code}): {resp.text}"
             )
 
         return [
@@ -190,11 +203,11 @@ class WinixDevice:
         payload = r.json()["body"]["data"][0]["attributes"]
 
         output = dict()
-        for (payload_key, attribute) in payload.items():
-            for (category, local_key) in self.category_keys.items():
+        for payload_key, attribute in payload.items():
+            for category, local_key in self.category_keys.items():
                 if payload_key == local_key:
                     if category in self.state_keys.keys():
-                        for (value_key, value) in self.state_keys[category].items():
+                        for value_key, value in self.state_keys[category].items():
                             if attribute == value:
                                 output[category] = value_key
                     else:
